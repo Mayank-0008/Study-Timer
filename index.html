@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SCHEDULE MANAGER</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+<header class="top">
+<h1>Study Timer</h1>
+<nav>
+
+<a href="index.html">Timer</a>
+<a href="sessions.html">Sessions</a>
+<a href="settings.html">About</a>
+</nav>
+</header>
+
+
+<main class="container">
+<section class="timer-card">
+<div class="pot-wrap">
+<div class="pot">
+<div class="fill" id="potFill"></div>
+</div>
+</div>
+
+
+<div class="controls">
+<h1 id="sessionLabel" style="text-align:center; color:black;"></h1>
+<h1><div class="display" id="timeDisplay" style="text-align:center; color:black;">00:00:00</div></h1>
+<div class="btn-row">
+<button id="startBtn">Start</button>
+<button id="pauseBtn">Pause</button>
+</div>
+
+
+<div class="quick">
+<label>Time (hh:mm:ss):
+<input id="timeInput" type="text" placeholder="00:01:00" value="00:01:00" />
+</label>
+<label>Label
+<input id="labelInput" type="text" placeholder="Work session" />
+</label>
+</div>
+</div>
+</section>
+</main>
+
+
+<footer class="foot">Made with ❤ — Simple focus timer</footer>
+
+
+<script src="js/timer.js"></script>
+</body>
+</html>

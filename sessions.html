@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessions - Schedule Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>Session History</h1>
+    <nav>
+      <a href="index.html">Timer</a>
+      <a href="sessions.html">Sessions</a>
+      <a href="settings.html">About</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Completed Sessions</h2>
+    <ul id="sessionList"></ul>
+    <button id="clearBtn">Clear All Sessions</button>
+
+    <h2>This Week’s Productivity</h2>
+    <canvas id="weeklyChart"></canvas>
+
+    <h2>All-Time Daily Focus</h2>
+    <canvas id="dailyChart"></canvas>
+  </main>
+
+  <footer class="foot">Made with ❤ — Simple focus timer</footer>
+
+  <script>
+    const sessionList = document.getElementById("sessionList");
+    const clearBtn = document.getElementById("clearBtn");
+    const weeklyCtx = document.getElementById("weeklyChart").getContext("2d");
+    const dailyCtx = document.getElementById("dailyChart").getContext("2d");
+
+    // --- Adaptive time formatter ---
+    function formatTimeAdaptive(totalSeconds) {
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+
+      if (h > 0) {
+        return `${h}h ${m}m`;
+      } else if (m > 0) {
+        return `${m}m ${s}s`;
+      } else {
+        return `${s}s`;
+      }
+    }
+
+    function loadSessions() {
+      const sessions = JSON.parse(localStorage.getItem("sessions") || "[]");
+      sessionList.innerHTML = "";
+
+      if (sessions.length === 0) {
+        sessionList.innerHTML = "<li>No sessions yet!</li>";
+        return;
+      }
+
+      // --- 1. Display session list ---
+      sessions.forEach(session => {
+        const li = document.createElement("li");
+        const duration = formatTimeAdaptive(session.lengthSec);
+        li.textContent = `${session.label} — ${duration} on ${new Date(session.timestamp).toLocaleString()}`;
+        sessionList.appendChild(li);
+      });
+
+      // --- 2. Weekly summary ---
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday start
+
+      const weekData = [0,0,0,0,0,0,0]; // store SECONDS
+      sessions.forEach(s => {
+        const date = new Date(s.timestamp);
+        if (date >= startOfWeek) {
+          weekData[date.getDay()] += s.lengthSec;
+        }
+      });
+
+      const weekLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      new Chart(weeklyCtx, {
+        type: "bar",
+        data: {
+          labels: weekLabels,
+          datasets: [{
+            label: "Time this week",
+            data: weekData,
+            backgroundColor: "rgba(75, 192, 192, 0.6)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: (value) => formatTimeAdaptive(value)
+              },
+              title: { display: true, text: "Focus Time" }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return formatTimeAdaptive(context.raw);
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // --- 3. All-time daily chart ---
+      const dailyTotals = {};
+      sessions.forEach(s => {
+        const date = new Date(s.timestamp).toLocaleDateString();
+        dailyTotals[date] = (dailyTotals[date] || 0) + s.lengthSec;
+      });
+
+      const labels = Object.keys(dailyTotals).reverse(); 
+      const data = Object.values(dailyTotals).reverse();
+
+      new Chart(dailyCtx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Focus Time (All Time)",
+            data: data,
+            borderColor: "rgba(54, 162, 235, 1)",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            tension: 0.2,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: (value) => formatTimeAdaptive(value)
+              },
+              title: { display: true, text: "Focus Time" }
+            },
+            x: {
+              title: { display: true, text: "Date" }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return formatTimeAdaptive(context.raw);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    clearBtn.addEventListener("click", () => {
+      localStorage.removeItem("sessions");
+      loadSessions();
+    });
+
+    loadSessions();
+  </script>
+</body>
+</html>

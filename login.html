@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="log.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h2 style="color: white; background-color: rgba(0,0,0,0); ">Login</h2>
+            <form id="loginform" action="#" method="post">
+                <script src="https://accounts.google.com/gsi/client" async></script>
+                    <div id="g_id_onload"
+                        data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                        data-login_uri="https://your.domain/your_login_endpoint"
+                        data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                        data-type="standard"
+                        data-size="large"
+                        data-theme="outline"
+                        data-text="sign_in_with"
+                        data-shape="rectangular"
+                        data-logo_alignment="left">
+                    </div>
+                    <p align="center" style="color: white; background-color: rgba(0,0,0,0); padding: 10px;">OR</p>
+                <div class="input-group">
+                    <label for="username">Email</label>
+                    <input type="text" id="username" name="username" placeholder="Enter Email" required>
+                    </label>
+                        <p id="emailMessage" style="margin:5px 0;"></p>
+                        <script>
+                            const emailInput = document.getElementById('username');
+                            const emailMessage = document.getElementById('emailMessage');
+
+                            // Simple email regex
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                            emailInput.addEventListener('input', () => {
+                            const email = emailInput.value.trim();
+                            if(email === "") {
+                                emailMessage.textContent = "";
+                            } else if(emailRegex.test(email)) {
+                                emailMessage.textContent = "Valid email ✅";
+                                emailMessage.style.color = "green";
+                            } else {
+                                emailMessage.textContent = "Invalid email ❌";
+                                emailMessage.style.color = "red";
+                            }
+                            });
+                        </script>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="" required>
+                </div>
+                <div class="forgot-password" style="text-align: right; margin-bottom: 15px;">
+                    <a href="forgot-password.html" style="color: aqua; text-decoration: none; font-size: 14px;">Forgot Password?</a>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+                <script>
+                    document.getElementById("loginform").addEventListener("submit", function(e) {
+                        e.preventDefault(); // stop actual form submission
+
+                        // You can add validation here (dummy check)
+                        const username = document.getElementById("username").value;
+                        const password = document.getElementById("password").value;
+
+                        if(username && password) {
+                        // Redirect to next page
+                        window.location.href = "index.html";  
+                      } else {
+                        alert("Please enter both username and password!");
+                      }
+                    });
+                </script>
+        </div>
+        <!--<p>Don't have an account? <a href="signup.html" style="color: aqua; text-decoration: none;">Sign Up</a></p>-->
+    </div>
+</body>
+</html>
